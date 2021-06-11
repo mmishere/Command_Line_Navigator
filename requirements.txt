@@ -3,3 +3,4 @@ pyfiglet
 plumbum
 pylint
 pytest
+os
