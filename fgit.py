@@ -18,7 +18,7 @@ def filter_underscore(name) -> bool:
 
 def generate_question(files):
     filtered_files = filter(filter_underscore, files)
-    print(filtered_files)
+    # print(filtered_files)
 
     return [{
         'type': 'checkbox',
@@ -57,7 +57,7 @@ if __name__ == "__main__":
 
 def test_get_files():
     files = get_files()
-    assert len(files) == 7, "Should be 7 files"
+    assert len(files) == 5, "Should be 5 files"
 
 def test_generate_question():
     files = ["best.rb", "good.kt", "small.py"]
