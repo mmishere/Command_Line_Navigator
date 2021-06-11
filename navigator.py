@@ -4,23 +4,33 @@ from pyfiglet import Figlet
 from questionary import prompt
 import questionary 
 
+import os
+
 def print_banner(text):
     print(Figlet(font='mini').renderText(text))
 
 
 def get_files():
-    files = ["New file", "New folder", "Quit", ".."]
-    ls_output = ls() # how to include hidden files?
-    files += ls_output.split("\n")
+    ls_output = ls() # how to include hidden folders?
+    files = ls_output.split("\n")
     return files
 
 
-def generate_question(files):
+def generate_question(filtered_folders):
     return questionary.rawselect(
         "Select the desired next location. Press ctrl+c to exit.",
-        choices = [{'name': file} for file in files]
+        choices = [{'name': folder} for folder in filtered_folders]
     )
 
+def filter_folders(unknown_file) -> bool:
+    if os.path.isdir(unknown_file):
+        return True
+    return False
+
+def filter_files(unknown_file) -> bool:
+    if os.path.isfile(unknown_file):
+        return True
+    return False
 
 class Navigator(cli.Application):
     VERSION = "1.0"
@@ -31,19 +41,34 @@ class Navigator(cli.Application):
         sh = local.session()
 
         while True:
-            # add mkdir and touch here (new folder, new file)
-            files = get_files()
-            question = generate_question(files)
+            extra_options = ["Quit", "New file", "New folder", ".."]
+            all_files = get_files()
+            filtered_folders = filter(filter_folders, all_files)
+            options = extra_options
+            for folder in filtered_folders:
+                options.append(folder)
+            
+
+            filtered_files = filter(filter_files, all_files)
+            print("FILES:")
+            for file in filtered_files:
+                print(file)
+            print("-----------")
+            
+            question = generate_question(options)
             answer = question.ask()
-            print(answer)
+
             if (answer == "New file"):
                 file_name = input("Input file name: ")
                 sh.run("touch " + file_name)
+
             elif (answer == "New folder"):
                 folder_name = input("Input folder name: ")
                 sh.run("mkdir " + folder_name)
+
             elif (answer == "Quit"):
                 break
+
             else:
                 try:
                     local.cwd.chdir(answer)
