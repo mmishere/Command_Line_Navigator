@@ -6,12 +6,15 @@ import questionary
 
 import os
 
+
+# it can navigate through, but it seems it doesn't save that to the command line
+
 def print_banner(text):
     print(Figlet(font='mini').renderText(text))
 
 
 def get_files():
-    ls_output = ls() # how to include hidden folders?
+    ls_output = ls('-a') # how to include hidden folders?
     files = ls_output.split("\n")
     return files
 
@@ -41,7 +44,7 @@ class Navigator(cli.Application):
         sh = local.session()
 
         while True:
-            extra_options = ["Quit", "New file", "New folder", ".."]
+            extra_options = ["QUIT", "NEW FILE", "NEW FOLDER"]
             all_files = get_files()
             filtered_folders = filter(filter_folders, all_files)
             options = extra_options
@@ -58,22 +61,23 @@ class Navigator(cli.Application):
             question = generate_question(options)
             answer = question.ask()
 
-            if (answer == "New file"):
+            if (answer == "NEW FILE"):
                 file_name = input("Input file name: ")
                 sh.run("touch " + file_name)
 
-            elif (answer == "New folder"):
+            elif (answer == "NEW FOLDER"):
                 folder_name = input("Input folder name: ")
                 sh.run("mkdir " + folder_name)
 
-            elif (answer == "Quit"):
+            elif (answer == "QUIT"):
                 break
 
             else:
                 try:
-                    local.cwd.chdir(answer)
+                    # local.cwd.chdir(answer)
+                    sh.run("cd " + answer)
                 except:
-                    print("Failed to change directory!")
+                    print("FAILED TO CHANGE DIRECTORY\n----------------")
 
 
 if __name__ == "__main__":
