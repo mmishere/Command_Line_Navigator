@@ -14,7 +14,13 @@ def print_banner(text):
 
 
 def get_files():
-    ls_output = ls('-a') # how to include hidden folders?
+    ls_output = ls()
+    files = [".."]
+    files += ls_output.split("\n")
+    return files
+
+def get_files_all():
+    ls_output = ls('-a')
     files = ls_output.split("\n")
     return files
 
@@ -45,7 +51,11 @@ class Navigator(cli.Application):
 
         while True:
             extra_options = ["QUIT", "NEW FILE", "NEW FOLDER"]
-            all_files = get_files()
+            all_files = ""
+            if self.all_flag:
+                all_files = get_files_all()
+            else:
+                all_files = get_files()
             filtered_folders = filter(filter_folders, all_files)
             options = extra_options
             for folder in filtered_folders:
@@ -75,7 +85,8 @@ class Navigator(cli.Application):
             else:
                 try:
                     # local.cwd.chdir(answer)
-                    sh.run("cd " + answer)
+                    # sh.run("cd " + answer)
+                    os.chdir(answer)
                 except:
                     print("FAILED TO CHANGE DIRECTORY\n----------------")
 
